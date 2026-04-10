@@ -58,6 +58,7 @@ coupons = [
 def get_coupons():
     return {"data": coupons} # Return a JSON response containing the list of products
 
+# GET http://127.0.0.1:5000/api/coupons/count
 @app.route("/api/coupons/count", methods=["GET"])
 def get_couponsCount():
     return {"count": len(coupons)}
