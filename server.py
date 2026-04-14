@@ -1,4 +1,6 @@
-from flask import Flask 
+from itertools import product
+
+from flask import Flask, jsonify, request # Import the Flask class and jsonify
 
 app = Flask(__name__) # Create a Flask application instance
 
@@ -13,7 +15,14 @@ def get_students():
     students_list = ["Sergio", "Leomar", "Charles", "Aymen","Dejanirra", "Freysy", "Trishon"]
     return students_list
 
+#------------Path Parameters------------
+@app.route("/greet/<string:name>", methods=["GET"]) # Define a route for the greet page that accepts GET requests and includes a path parameter for the name
+def say_hi(name): # The function takes the name parameter from the URL and returns a JSON response with a personalized greeting message
+    return jsonify({"message": f"Hello {name}"}), 200 # Concatenate the greeting message with the name parameter to create a personalized greeting
 
+@app.route("/api/users/<int:user_id>", methods=["GET"])
+def get_user_by_id(user_id):
+    return jsonify({"this is the user id": user_id}), 200 # Return a JSON response containing the user ID extracted from the URL path parameter
 #  ------ Products
 products = [
   {
@@ -44,6 +53,33 @@ products = [
 def get_products():
     return {"data": products} # Return a JSON response containing the list of products
 
+@app.route("/api/products/<int:product_id>", methods=["GET"])
+def get_product_by_id(product_id):
+    for product in products:
+       if (product["_id"]) == product_id:
+           return jsonify({
+               "success": True,
+               "message": f"Product with id {product_id} found",
+               "data": product 
+           }), 200 # OK 
+    
+    return jsonify({
+        "success": False,
+        "message": f"Proudct with id {product_id} not found",
+    }), 404 # Not Found
+
+@app.route("/api/products", methods=["POST"])
+def create_product():
+    print(f"new product: {request.get_json()}") # Get the JSON data from the request body and parse it into a Python dictionary  
+    new_product = request.get_json() # Store the new product data in a variable
+    products.append(new_product) # Add the new product to the products list
+    return jsonify({
+        "success": True,
+        "message": "Product added successfully",
+        "data": new_product        
+    }), 201 # Created
+
+
 
 # ---- Coupons ----
 
@@ -56,15 +92,48 @@ coupons = [
 # GET http://127.0.0.1:5000/api/coupons
 @app.route("/api/coupons", methods=["GET"]) # Define a route for the products page that accepts GET requests
 def get_coupons():
-    return {"data": coupons} # Return a JSON response containing the list of products
+    return ({"data": coupons}) # Return a JSON response containing the list of products
+
+
+@app.route("/api/coupons", methods=["POST"])
+def create_coupon():
+    new_coupon = request.get_json() # Get the JSON data from the request body and parse it into a Python dictionary
+    
+    print(f"new coupon: {new_coupon}") # Get the JSON data from the request body and parse it into a Python dictionary  
+    
+    coupons.append(new_coupon) # Add the new coupon to the coupons list
+    
+    return jsonify({
+        "success": True,
+        "message": "Coupon added successfully",
+        "data": new_coupon        
+    }), 201 # Created
+
+#GET http://127.0.0.1:5000/api/coupons/<int:id>
+@app.route("/api/coupons/<int:coupon_id>", methods=["GET"])
+def get_coupon_by_id(coupon_id):
+    for coupon in coupons:
+        if coupon["_id"] == coupon_id:
+            return jsonify({
+                "success": True,
+                "message": f"Coupon with id {coupon_id} found",
+                "data": coupon
+            }), 200 # OK
+    else:
+        return jsonify({
+            "success": False,
+            "message": f"Coupon with id {coupon_id} not found",
+        }), 404 # Not Found
 
 # GET http://127.0.0.1:5000/api/coupons/count
 @app.route("/api/coupons/count", methods=["GET"])
 def get_couponsCount():
-    return {"count": len(coupons)}
+    return ({"count": len(coupons)})
+
+
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True) # Start the Flask development server with debug mode enabled, allowing for easier debugging and automatic reloading of the server when code changes are detected.
     
 # Wehn this file is run directly: __name_== "__main__" will evaluate to True, and the code inside this block will be executed.
 # When this file is imported as module: __name__ == "server.py"

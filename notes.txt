@@ -3,7 +3,7 @@ WIN py/python -m venv venv
 MacOS python3 -m venv venv
 
 -- Activate the venv --
-WIN venv\Script\Activate
+WIN venv\Script\activate
 MacOS source venv/bin/Activate
 
 -- Install Flask --
@@ -12,3 +12,20 @@ pip install Flask
 -- Run App --
 WIN py/python server.py
 MacOS python3 server.py
+
+C reate   --> Post
+R ead	  --> Get
+U update  --> Put
+D elete   --> Delete
+
+@ --> a Decorator
+
+@app.route("/user", methods=["GET"])
+def get user():
+	return {"name": "John"}
+
+1> Decorator (function wrapper)
+2> Path (URL ex. "/home")
+3> Method (GET/PULL etc..)
+4> Function (def home():)
+5> Return ({message: ""})
